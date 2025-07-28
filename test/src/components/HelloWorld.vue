@@ -6,6 +6,9 @@ import type { BrowserImageResizerConfig } from 'image-rs-wasm'
 defineProps<{ msg: string }>()
 
 const wasmLoaded = ref(false)
+const maxSize = ref(1024)
+const quality = ref(0.8)
+const mimeType = ref('image/avif')
 const file = ref<File | null>(null)
 const url = ref<string | null>(null)
 
@@ -18,12 +21,16 @@ function onFileChange(event: Event) {
 }
 
 async function onClick() {
+  if (url.value) {
+    URL.revokeObjectURL(url.value) // Clean up previous URL
+    url.value = null // Reset URL
+  }
   if (file.value) {
     const config: BrowserImageResizerConfig = {
       algorithm: 'catmull-rom',
       max_width: 1024,
       max_height: 1024,
-      quality: 0.8,
+      quality: quality.value,
       mime_type: 'image/avif',
     }
     const u8src = await file.value.arrayBuffer().then(ab => new Uint8Array(ab));
@@ -41,14 +48,29 @@ init().then(() => {
 
 <template>
   <h1>{{ msg }}</h1>
+  <p>OffscreenCanvas version (current): <a href="https://github.com/misskey-dev/browser-image-resizer" target="_blank">misskey-dev/browser-image-resizer</a></p>
 
   <input type="file" accept="image/*" @change="onFileChange" />
   <div class="card">
-    <button v-if="wasmLoaded" type="button" @click="onClick">JUST DO IT</button>
+    <div>
+      <label for="maxSize">Max W/H:</label>
+      <input type="number" id="maxSize" v-model.number="maxSize" min="1" step="1" />
+    </div>
+    <div>
+      <label for="mimeType">MIME Type:</label>
+      <select id="mimeType" v-model="mimeType">
+        <option value="image/avif">AVIF</option>
+        <option value="image/webp">WEBP</option>
+        <option value="image/jpeg">JPEG</option>
+        <option value="image/png">PNG</option>
+        <option value="image/gif">GIF</option>
+      </select>
+    </div>
+    <button v-if="wasmLoaded" type="button" @click="onClick">CONVERT</button>
   </div>
   <div v-if="url" class="card">
     <img :src="url" alt="Compressed Image" />
-    <p><a :href="url" download="compressed_image.png">Download Compressed Image</a></p>
+    <p><a :href="url" :download="`compressed_image.${mimeType.split('/')[1]}`">Download Compressed Image</a></p>
   </div>
 </template>
 
