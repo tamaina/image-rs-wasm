@@ -8,6 +8,6 @@ extern "C" {
 }
 
 #[wasm_bindgen]
-pub fn greet() {
-    alert("Hello, image-rs-wasm!");
+pub fn greet(s: &str) {
+    alert(&format!("Hello, {}!", s));
 }

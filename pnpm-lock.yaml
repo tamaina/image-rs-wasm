@@ -24,7 +24,7 @@ importers:
         version: 0.7.0(typescript@5.8.3)(vue@3.5.18(typescript@5.8.3))
       image-rs-wasm:
         specifier: workspace:*
-        version: link:..
+        version: link:../pkg
       typescript:
         specifier: ~5.8.3
         version: 5.8.3

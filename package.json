@@ -1,5 +1,5 @@
 {
-  "name": "image-rs-wasm",
+  "name": "irw",
   "version": "1.0.0",
   "description": "",
   "private": true,
@@ -10,7 +10,8 @@
     "test"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build:wasm": "wasm-pack build --target web",
+    "build": "pnpm run build:wasm && pnpm -F run test build"
   },
   "keywords": [],
   "author": "",
