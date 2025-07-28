@@ -11,7 +11,7 @@
   ],
   "scripts": {
     "build:wasm": "wasm-pack build --release --target web",
-    "build": "pnpm run build:wasm && pnpm -F run test build"
+    "build": "pnpm run build:wasm && pnpm -F test run build"
   },
   "keywords": [],
   "author": "",
