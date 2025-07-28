@@ -24,11 +24,11 @@ async function onClick() {
       max_width: 1024,
       max_height: 1024,
       quality: 0.8,
-      mime_type: 'image/jpeg',
+      mime_type: 'image/avif',
     }
-    const u8 = await read_and_compress_image(file.value, config) as Uint8Array<ArrayBuffer>
-    console.log('Compressed image blob:', u8)
-    url.value = URL.createObjectURL(new Blob([u8], { type: config.mime_type }))
+    const u8src = await file.value.arrayBuffer().then(ab => new Uint8Array(ab));
+    const u8res = await read_and_compress_image(u8src, config) as Uint8Array<ArrayBuffer>
+    url.value = URL.createObjectURL(new Blob([u8res], { type: config.mime_type }))
   } else {
     console.warn('No file selected')
   }
