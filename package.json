@@ -10,7 +10,7 @@
     "test"
   ],
   "scripts": {
-    "build:wasm": "wasm-pack build --target web",
+    "build:wasm": "wasm-pack build --release --target web",
     "build": "pnpm run build:wasm && pnpm -F run test build"
   },
   "keywords": [],
