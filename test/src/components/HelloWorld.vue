@@ -28,8 +28,8 @@ async function onClick() {
   if (file.value) {
     const config: BrowserImageResizerConfig = {
       algorithm: 'catmull-rom',
-      max_width: 1024,
-      max_height: 1024,
+      max_width: maxSize.value,
+      max_height: maxSize.value,
       quality: quality.value,
       mime_type: 'image/avif',
     }
