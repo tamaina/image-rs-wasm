@@ -43,7 +43,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'pnpm'
     - run: pnpm i --frozen-lockfile
-    - run: cargo install wasm-pack
+    - run: cargo install --force wasm-pack
     - run: pnpm run build
     - name: Setup Pages
       uses: actions/configure-pages@v5
