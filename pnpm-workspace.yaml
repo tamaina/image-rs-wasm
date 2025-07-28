@@ -1,0 +1,6 @@
+packages:
+  - pkg
+  - test
+
+ignoredBuiltDependencies:
+  - esbuild
