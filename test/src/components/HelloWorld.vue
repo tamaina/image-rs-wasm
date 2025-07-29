@@ -31,7 +31,7 @@ async function onClick() {
       max_width: maxSize.value,
       max_height: maxSize.value,
       quality: quality.value,
-      mime_type: 'image/avif',
+      mime_type: mimeType.value,
     }
     const u8src = await file.value.arrayBuffer().then(ab => new Uint8Array(ab));
     const u8res = await read_and_compress_image(u8src, config) as Uint8Array<ArrayBuffer>
