@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import init, { read_and_compress_image } from 'image-rs-wasm'
+import ExecWasm from '../workers/exec-wasm?worker';
 import type { BrowserImageResizerConfig } from 'image-rs-wasm'
 
 defineProps<{ msg: string }>()
 
-const wasmLoaded = ref(false)
+const workerLoaded = ref(false)
 const maxSize = ref(1024)
 const quality = ref(0.8)
 const mimeType = ref('image/avif')
@@ -20,11 +20,16 @@ function onFileChange(event: Event) {
   }
 }
 
-async function onClick() {
+function revokeUrl() {
   if (url.value) {
-    URL.revokeObjectURL(url.value) // Clean up previous URL
-    url.value = null // Reset URL
+    URL.revokeObjectURL(url.value)
+    url.value = null
+    console.log('Revoked URL:', url.value)
   }
+}
+
+async function onClick() {
+  revokeUrl()
   if (file.value) {
     const config: BrowserImageResizerConfig = {
       algorithm: 'catmull-rom',
@@ -33,17 +38,28 @@ async function onClick() {
       quality: quality.value,
       mime_type: mimeType.value,
     }
-    const u8src = await file.value.arrayBuffer().then(ab => new Uint8Array(ab));
-    const u8res = await read_and_compress_image(u8src, config) as Uint8Array<ArrayBuffer>
-    url.value = URL.createObjectURL(new Blob([u8res], { type: config.mime_type }))
+    worker.postMessage({
+      file: file.value,
+      config,
+    });
   } else {
     console.warn('No file selected')
   }
 }
 
-init().then(() => {
-  wasmLoaded.value = true
-})
+const worker = new ExecWasm()
+worker.onmessage = (event) => {
+  if (event.data?.status === 'initialized') {
+    workerLoaded.value = true
+    console.log('Worker initialized successfully')
+  } else if (event.data?.status === 'error') {
+    console.error('Worker error:', event.data.error)
+  } else if (event.data?.status === 'success') {
+    revokeUrl()
+    url.value = URL.createObjectURL(new Blob([event.data.data], { type: event.data.config.mime_type }))
+    console.log('Image processed successfully:', url.value)
+  }
+}
 </script>
 
 <template>
@@ -66,7 +82,7 @@ init().then(() => {
         <option value="image/gif">GIF</option>
       </select>
     </div>
-    <button v-if="wasmLoaded" type="button" @click="onClick">CONVERT</button>
+    <button v-if="workerLoaded" type="button" @click="onClick">CONVERT</button>
   </div>
   <div v-if="url" class="card">
     <img :src="url" alt="Compressed Image" />
